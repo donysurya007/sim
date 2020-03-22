@@ -46,5 +46,12 @@ class AdminController extends Controller
         return redirect('boardmahasiswa')->with('sukses', 'Data Berhasil di Hapus');
     }
 
+    public function mhsapi()
+    {
+        $data_mahasiswa = DB::table('mahasiswa')->paginate(10);
+        //$data_mahasiswa = $mhs->all();
+        return response()->json($data_mahasiswa);
+    }
+
 
 }

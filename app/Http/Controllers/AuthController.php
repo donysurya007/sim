@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Auth;
 use Illuminate\Http\Request;
+use App\User;
 
 class AuthController extends Controller
 {
@@ -25,4 +26,31 @@ class AuthController extends Controller
         Auth::logout();
         return redirect('/logins');
     }
+
+    public function register(Request $request, User $user)
+    {
+      $this->validate($request, [
+        'name' => 'required',
+        'email' => 'required|email|unique:users',
+        'password' => 'required',
+      ]);
+      $user->create([
+        'name'           => $request->name,
+        'email'          => $request->email,
+        'password'       => bcrypt($request->password),
+        'remember_token' => bcrypt($request->email),
+      ]);
+    }
+    public function loginapi(Request $request, User $user)
+    {
+      if(!auth::attempt(['name' => $request->name, 'password' => $request->password]))
+    {
+        return response()->json(['error' => 'username or password wrong'],401);
+    }
+    $user = $user->find(auth::user()->id);
+    return response()->json([
+      'name' => $user->name,
+      'email' =>$user->email,
+    ]);
+  }
 }
